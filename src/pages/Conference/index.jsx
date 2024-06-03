@@ -7,6 +7,7 @@ import useAgora from "../../hooks/useAgora";
 import { APP_ID } from "../../lib/config";
 import CallEndIcon from "@material-ui/icons/CallEnd";
 import { IconButton, Modal, Button } from "@material-ui/core";
+import SwitchCameraIcon from '@material-ui/icons/SwitchCamera';
 import CallIcon from "@material-ui/icons/Call";
 import MicIcon from "@material-ui/icons/Mic";
 import MicOffIcon from "@material-ui/icons/MicOff";
@@ -48,6 +49,8 @@ const Conference = (props) => {
 
   const [modalPatientOpen, setModalPatientOpen] = useState(false);
   const [modalDoctorOpen, setModalDoctorOpen] = useState(false);
+  const [videoDevices, setVideoDevices] = useState([]);
+  const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
 
   React.useEffect(() => {
     const options = { ...localMedia };
@@ -93,6 +96,14 @@ const Conference = (props) => {
       fetchUserRoleById(user_id);
     }
   }, []);
+  
+  React.useEffect(() => {
+    const getVideoDevices = async () => {
+      const devices = await AgoraRTC.getCameras();
+      setVideoDevices(devices);
+    };
+    getVideoDevices();
+  }, []);
 
   const handleVideoClick = () => {
     if (!localMedia.video) {
@@ -101,6 +112,17 @@ const Conference = (props) => {
     } else {
       removeLocalVideoTracks();
       setLocalMedia((prev) => ({ ...prev, video: false }));
+    }
+  };
+
+  const handleVideoCam = async () => {
+    if (videoDevices.length >= 1) {
+      const nextDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
+      const nextDevice = videoDevices[nextDeviceIndex];
+      console.log(nextDevice);
+      await localVideoTrack.setDevice(nextDevice.deviceId);
+    
+      setCurrentDeviceIndex(nextDeviceIndex);
     }
   };
 
@@ -209,6 +231,13 @@ const Conference = (props) => {
             ) : (
               <VideocamOffIcon style={{ color: "#fff" }} />
             )}
+          </IconButton>
+          <IconButton 
+            onClick={handleVideoCam}
+            className="p-2 m-2"
+            style={{ background: localMedia.video ? "#40ad40d9" : "#808080" }}
+          > 
+            <SwitchCameraIcon style={{ color: "#fff" }} />
           </IconButton>
           <IconButton
             disabled={remoteUsers.length < 1}

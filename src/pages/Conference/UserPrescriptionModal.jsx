@@ -4,7 +4,7 @@ import { Button, Modal, Table } from "react-bootstrap";
 import { echo } from "../../lib/pusher";
 import { API_URL } from "../../lib/api";
 
-const UserPrescriptionModal = ({ open, onClose, patientId }) => {
+const UserPrescriptionModal = ({ open, onClose, patientId, onEndCall}) => {
   const [tbodyData, setTbodyData] = useState([]);
   const [prescriptionId, setPrescriptionId] = useState(null);
 
@@ -12,6 +12,7 @@ const UserPrescriptionModal = ({ open, onClose, patientId }) => {
     const handleNewPrescription = (e) => {
       setTbodyData(e.carts);
       setPrescriptionId(e.prescription_id);
+      alert('Bạn có đơn hàng mới của bác sĩ');
     };
 
     echo
@@ -35,7 +36,7 @@ const UserPrescriptionModal = ({ open, onClose, patientId }) => {
           Đơn thuốc của bạn
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body style={{ maxHeight: "400px" }}>
+      <Modal.Body>
         <Table
           striped
           bordered
@@ -82,12 +83,13 @@ const UserPrescriptionModal = ({ open, onClose, patientId }) => {
         {prescriptionId && (
           <Button
             variant="primary"
-            onClick={() =>
+            onClick={() => {
+              onEndCall();
               window.open(
                 API_URL + `/checkout?prescription_id=` + prescriptionId,
                 "_blank"
-              )
-            }
+              );
+            }}
           >
             Tới trang thanh toán
           </Button>

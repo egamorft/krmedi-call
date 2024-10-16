@@ -51,3 +51,33 @@ export const addToPrescriptionCart = async (requestData) => {
         return error;
     }
 };
+
+export const viewPatientHistory = async (doctorId) => {
+    try {
+      const response = await api.get(API_URL + `/api/my-bookings/list/${doctorId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      throw error;
+    }
+  };
+  
+export const fetchBookings = async (patientId) => {
+    try {
+        const response = await api.get(API_URL + `/api/my-bookings/history/${patientId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching bookings:", error);
+        return null;
+    }
+};
+
+export const updateMedicalHistory = async (patientId, requestData) => {
+    try {
+      const response = await api.post(API_URL + `/api/my-bookings/history/${patientId}`, requestData);
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+};
